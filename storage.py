@@ -28,4 +28,4 @@ class InMemoryStorage():
 
     def store_multiple(self, keys_vals):
         for k, v in keys_vals.iteritems():
-            self.store(k, v)
+            self.store(k, v[0])
