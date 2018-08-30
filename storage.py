@@ -9,12 +9,13 @@ class BaseStorage():
         pass
 
     @abc.abstractmethod
-    def retrieve(self):
+    def store_multiple(self):
         pass
 
     @abc.abstractmethod
-    def store_multiple(self):
+    def retrieve(self):
         pass
+
 
 class InMemoryStorage():
 
@@ -23,9 +24,9 @@ class InMemoryStorage():
     def store(self, key, val):
         self.CONTAINER[key] = val
 
-    def retrieve(self, key):
-        return self.CONTAINER.get(key)
-
     def store_multiple(self, keys_vals):
         for k, v in keys_vals.iteritems():
             self.store(k, v[0])
+
+    def retrieve(self, key):
+        return self.CONTAINER.get(key)
