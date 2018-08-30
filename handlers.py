@@ -8,7 +8,10 @@ class RequestHandler(BaseHTTPRequestHandler):
     STORAGE = InMemoryStorage()
 
     def do_GET(self):
-        path, params = self.parse()
+        try:
+            path, params = self.parse()
+        except ValueError:
+            return
 
         if(path == 'set'):
             self.STORAGE.store_multiple(params)
@@ -20,20 +23,41 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def parse(self):
         delim_idx = self.path.index('?')
-        path  = self.path[1:delim_idx]
+
+        if not delim_idx:
+            self.handle_error(
+                400, "%s is an invalid path, please try again\n" % self.path)
+            return
+
+        parsed_path  = self.path[1:delim_idx]
         params = parse_qs(self.path[delim_idx+1:])
-        self.validate(path, params)
-        return path, params
+        self.validate(parsed_path, params)
+        return parsed_path, params
 
-    def validate(self, path, params):
-        self.validate_path()
-        self.validate_params()
+    def validate(self, parsed_path, params):
+        self.validate_path(parsed_path)
+        self.validate_params(parsed_path, params)
 
-    def validate_path(self):
-        pass
+    def validate_path(self, parsed_path):
+        if parsed_path not in ('get', 'set'):
+            self.handle_error(
+                400, "%s is an invalid path, please try again\n" % self.path)
+            raise ValueError
 
-    def validate_params(self):
-        pass
+    def validate_params(self, parsed_path, params):
+
+        for param, val in params.iteritems():
+            if len(val) > 1:
+                self.handle_error(
+                    400, "Error: multiple values provided for key %s" % param)
+                raise ValueError
+
+        if parsed_path == 'get':
+            if(len(params) != 1 or 'key' not in params):
+                self.handle_error(
+                    400, "Retrieval queries only support the 'key' queryparam")
+                raise ValueError
+
 
     def handle_ok(self, response_body):
         self.send_response(200)
