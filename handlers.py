@@ -15,6 +15,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         """
         Handles GET requests. All other requests return 501.
 
+        Note that query params are stored as a list, but our validation
+        ensures only one value is stored for a given key, we therefore store
+        and retrieve the first element provided.
+
         :return: None
         :rtype: None
         """
@@ -24,7 +28,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         if(path == 'set'):
-            self.STORAGE.store_multiple(params)
+            self.STORAGE.store_multiple({k: v[0] for k,v in params.iteritems()})
             self.handle_ok("OK\n")
         elif(path == 'get'):
             self.handle_ok("%s\n" % self.STORAGE.retrieve(params['key'][0]))

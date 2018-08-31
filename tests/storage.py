@@ -16,13 +16,9 @@ class BaseStorageTest(unittest.TestCase):
 class InMemoryStorageTest(unittest.TestCase):
 
     def setUp(self):
-        #import ipdb; ipdb.set_trace()
         self.storage = InMemoryStorage()
 
     def test_store(self):
-
-        #import ipdb; ipdb.set_trace()
-
         self.storage.store('a', 'b')
 
         # pop to ensure container is empty at the end
