@@ -71,6 +71,8 @@ class RequestHandlerTest(unittest.TestCase):
 
 
     def tearDown(cls):
+
+        # have to reset in order to avoid stepping on other tests
         InMemoryStorage.CONTAINER = {}
 
     def _create_mock_handler(self, path):
