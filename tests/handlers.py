@@ -43,6 +43,11 @@ class RequestHandlerTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             mock_handler.parse()
 
+        # cannot set multiple values for same queryparam
+        mock_handler = self._create_mock_handler('/set?fruit=pear&fruit=plum')
+        with self.assertRaises(ValueError):
+            mock_handler.parse()
+
         # missing queryparams
         mock_handler = self._create_mock_handler('/set')
         with self.assertRaises(ValueError):
