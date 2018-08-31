@@ -22,13 +22,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.handle_error(400, "%s is an invalid path, please try again\n" % path)
 
     def parse(self):
-        delim_idx = self.path.index('?')
-
-        if not delim_idx:
+        if '?' not in self.path:
             self.handle_error(
                 400, "%s is an invalid path, please try again\n" % self.path)
-            return
+            raise ValueError
 
+        delim_idx = self.path.index('?')
         parsed_path  = self.path[1:delim_idx]
         params = parse_qs(self.path[delim_idx+1:])
         self.validate(parsed_path, params)
@@ -55,7 +54,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         if parsed_path == 'get':
             if(len(params) != 1 or 'key' not in params):
                 self.handle_error(
-                    400, "Retrieval queries only support the 'key' queryparam")
+                    400, "Retrieval queries only support the 'key' query "
+                         "parameter\n"
+                )
                 raise ValueError
 
 
