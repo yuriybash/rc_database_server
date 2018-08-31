@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import unittest
 
-from ..storage import BaseStorage, InMemoryStorage
+from storage import BaseStorage, InMemoryStorage
 
 class BaseStorageTest(unittest.TestCase):
 
@@ -34,6 +34,3 @@ class InMemoryStorageTest(unittest.TestCase):
     def test_retrieve(self):
         self.storage.store('a', 'b')
         self.assertEqual('b', self.storage.retrieve('a'))
-
-if __name__ == '__main__':
-    unittest.main()
