@@ -4,10 +4,20 @@ from urlparse import parse_qs
 
 
 class RequestHandler(BaseHTTPRequestHandler):
+    """
+    Main request handler
+    """
 
     STORAGE = InMemoryStorage()
+    SUPPORTED_PATHS = ('get', 'set')
 
     def do_GET(self):
+        """
+        Handles GET requests. All other requests return 501.
+
+        :return: None
+        :rtype: None
+        """
         try:
             path, params = self.parse()
         except ValueError:
@@ -22,6 +32,14 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.handle_error(400, "%s is an invalid path, please try again\n" % path)
 
     def parse(self):
+        """
+        Parse provided path and query params for validation and key
+        setting/retrieval.
+
+        :return: the parsed path and params (e.g. ('set', {'fruit': ['apple']})
+        :rtype: (str, dict)
+        :raises: ValueError
+        """
         if '?' not in self.path:
             self.handle_error(
                 400, "%s is an invalid path, please try again\n" % self.path)
@@ -34,16 +52,48 @@ class RequestHandler(BaseHTTPRequestHandler):
         return parsed_path, params
 
     def validate(self, parsed_path, params):
+        """
+        Validate the given path and params.
+
+        :param parsed_path: the path (e.g. "set")
+        :type parsed_path: str
+        :param params: the query params (e.g. {"fruit": ["apple"]})
+        :type params: dict
+        :return: None
+        :rtype: None
+        :raises: ValueError
+        """
         self.validate_path(parsed_path)
         self.validate_params(parsed_path, params)
 
     def validate_path(self, parsed_path):
-        if parsed_path not in ('get', 'set'):
+        """
+        Validate the given path. Currently supports `get` and `set`.
+
+        :param parsed_path: the parsed path
+        :type parsed_path: str
+        :return: None
+        :rtype: None
+        :raises: ValueError
+        """
+        if parsed_path not in self.SUPPORTED_PATHS:
             self.handle_error(
                 400, "%s is an invalid path, please try again\n" % self.path)
             raise ValueError
 
     def validate_params(self, parsed_path, params):
+        """
+        Validate the given params. Requirements: only one value per queryparam
+        and only one key can be retrieved at a time.
+
+        :param parsed_path: the parsed path
+        :type parsed_path: str
+        :param params: the queryparams
+        :type params: dict
+        :return: None
+        :rtype: None
+        :raises: ValueError
+        """
 
         for param, val in params.iteritems():
             if len(val) > 1:
@@ -61,13 +111,31 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 
     def handle_ok(self, response_body):
+        """
+        Handles the sending of OK responses.
+
+        :param response_body: response body to be sent
+        :type response_body: str
+        :return: None
+        :rtype: None
+        """
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         self.wfile.write(response_body)
 
     def handle_error(self, status_code, response_body):
-        self.send_response(400)
+        """
+        Handles the sending of bad responses.
+
+        :param status_code: status code to be sent
+        :type status_code: int
+        :param response_body: response body to be sent
+        :type response_body: str
+        :return: None
+        :rtype: None
+        """
+        self.send_response(status_code)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         self.wfile.write(response_body)
