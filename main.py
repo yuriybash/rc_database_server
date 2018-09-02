@@ -11,7 +11,7 @@ def run_server():
 
     :return: None
     """
-    port = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_PORT
+    port = int(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_PORT
     address = ('127.0.0.1', port)
     httpd = HTTPServer(address, RequestHandler)
     print('Starting server on port %d' % port)
